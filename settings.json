@@ -1,0 +1,4 @@
+{
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnstyle: Google, IndentWidth: 4 }",
+    "C_Cpp.autoAddFileAssociations": false
+}
