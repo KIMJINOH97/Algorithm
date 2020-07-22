@@ -31,6 +31,7 @@
   "prettier.singleQuote": false,
   "C_Cpp.updateChannel": "Insiders",
   "files.associations": {
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "iostream": "cpp"
   }
 }
