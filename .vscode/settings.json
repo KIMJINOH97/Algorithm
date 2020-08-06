@@ -1,37 +1,38 @@
 {
-  "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}",
-  "terminal.integrated.shell.windows": "C:\\WINDOWS\\System32\\cmd.exe",
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[javascript]": {
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}",
+    "terminal.integrated.shell.windows": "C:\\WINDOWS\\System32\\cmd.exe",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
-  "code-runner.executorMap": {
-    "c": "cd $dirWithoutTrailingSlash gcc $fileName -g -o $fileNameWithoutExt && $fileNameWithoutExt.exe",
-    // input.txt로 바로 입력.
-    "cpp": "cd $dirWithoutTrailingSlash && g++ $fileName -g -o $fileNameWithoutExt && $fileNameWithoutExt.exe < input.txt",
-    // 직접 실행후 입력할때. //
-    "cpp": "cd $dirWithoutTrailingSlash && g++ $fileName -g -o $fileNameWithoutExt && $fileNameWithoutExt.exe",
-    "python": "python"
-  },
-  "eslint.validate": [
-    {
-      "language": "javascript",
-      "autoFix": true
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
     },
-    {
-      "language": "python"
+    "code-runner.executorMap": {
+        "c": "cd $dirWithoutTrailingSlash gcc $fileName -g -o $fileNameWithoutExt && $fileNameWithoutExt.exe",
+        // input.txt로 바로 입력.
+        "cpp": "cd $dirWithoutTrailingSlash && g++ $fileName -g -o $fileNameWithoutExt && $fileNameWithoutExt.exe < input.txt",
+        // 직접 실행후 입력할때. //
+        "cpp": "cd $dirWithoutTrailingSlash && g++ $fileName -g -o $fileNameWithoutExt && $fileNameWithoutExt.exe",
+        "python": "python"
+    },
+    "eslint.validate": [
+        {
+            "language": "javascript",
+            "autoFix": true
+        },
+        {
+            "language": "python"
+        }
+    ],
+    "code-runner.runInTerminal": true,
+    "window.zoomLevel": 0,
+    "debug.node.autoAttach": "on",
+    "editor.formatOnSave": true,
+    "workbench.colorTheme": "One Dark Pro",
+    "prettier.singleQuote": true,
+    "C_Cpp.updateChannel": "Insiders",
+    "files.associations": {
+        "ostream": "cpp",
+        "iostream": "cpp",
+        "bits/stdc++.h": "cpp"
     }
-  ],
-  "code-runner.runInTerminal": true,
-  "window.zoomLevel": 0,
-  "debug.node.autoAttach": "on",
-  "editor.formatOnSave": true,
-  "workbench.colorTheme": "One Dark Pro",
-  "prettier.singleQuote": false,
-  "C_Cpp.updateChannel": "Insiders",
-  "files.associations": {
-    "ostream": "cpp",
-    "iostream": "cpp"
-  }
 }
