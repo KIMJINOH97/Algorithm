@@ -1,3 +1,4 @@
+
 //
 // CPU Schedule Simulator Homework
 // Student Number : B611050
@@ -78,6 +79,14 @@ void initProcTable() {
         }
 }
 
+struct process *lastReadyQ(){
+        struct process *currentReadyQueue = &readyQueue;
+        while(readyQueue.len>0 && currentReadyQueue->next != NULL){
+                currentReadyQueue = currentReadyQueue->next;
+        }
+        return currentReadyQueue;
+}
+
 void procExecSim(struct process *(*scheduler)()) {
         int pid, qTime=0, cpuUseTime = 0, nproc=0, termProc = 0, nioreq=0;
         char schedule = 0, nextState = S_IDLE;
@@ -85,32 +94,24 @@ void procExecSim(struct process *(*scheduler)()) {
 
         nextForkTime = procIntArrTime[nproc];
         nextIOReqTime = ioReqIntArrTime[nioreq];
-        // IO request time은 cpu 사용 도중에만 발생함
 
         runningProc = &idleProc; // 초기 돌아가는 프로세스는 idle
-        int time=0; // 전체시간
-        while(1) {
 
-                time++;
+        while(1) {
                 currentTime++; // 프로세스 생성 후 타이머
-                if(runningProc -> id == 72){
-                        printf("WWWWWWWWW time: %d  target : %d service : %d \n", time, runningProc->targetServiceTime, runningProc->serviceTime);
-                }
                 qTime++;
                 runningProc->serviceTime++;
                 if (runningProc != &idleProc ) cpuUseTime++; //cpu 사용할 때 동작
+
                 // MUST CALL compute() Inside While loop
                 compute();
 
-                if(time == 500){ // 디버깅용
+                if(0){ // 디버깅용
                         /*struct process *c = &readyQueue;
                           while(c != NULL){
                           printf("%d\n", c->id);
                           c=c->next;
                           }*/
-                        // printf("%d\n", procIntArrTime[99]);
-
-                        // struct process *check = scheduler();
                         // printf("check id = %d queue.len = %d\n", check->id, readyQueue.len);
                         return ;
                 }
@@ -118,7 +119,6 @@ void procExecSim(struct process *(*scheduler)()) {
                 if (currentTime == nextForkTime) { /* CASE 2 : a new process created */
                         // readyQueue에 프로세스 넣는 과정
                         struct process *currentQueue = &readyQueue;
-                        int i=0;
                         while(readyQueue.len > 0 && currentQueue->next != NULL){ // Queue의 끝까지 찾음
                                 currentQueue = currentQueue->next;
                         }
@@ -126,42 +126,25 @@ void procExecSim(struct process *(*scheduler)()) {
 
                         procTable[nproc].state = S_READY;
                         readyQueue.len++;
-                        nextForkTime = procIntArrTime[++nproc];
-                        currentTime = 0;
-                        if(runningProc == &idleProc){ // idle 상태면 스케쥴링
-                                runningProc = scheduler();
-                                runningProc->state = S_RUNNING;
-                        }
-                        printf("프로세스 생성 runningProc id: %d lastQueue id : %d\n", runningProc->id, currentQueue->next->id);
-                        printf("ready Queue len: %d procIntarrtime: %d \n", readyQueue.len, procIntArrTime[nproc]);
+                        nextForkTime = currentTime + procIntArrTime[++nproc];
+
+                        printf("프로세스 생성 id : %d   %d\n", procTable[nproc-1].id, readyQueue.len);
                 }
-                if (qTime == QUANTUM ) { /* CASE 1 : The quantum expires */
+
+                if (qTime == QUANTUM ) { // CASE 1 : The quantum expires
                         // 현재 돌고 있는 process를 readyqueue에 넣고 스케쥴링
-                        printf("퀀텀전 runningProc id : %d 타겟서비스: %d 서비스: %d  req Q : %d\n", runningProc->id, runningProc->targetServiceTime, runningProc->serviceTime, readyQueue.len);
-                        if(runningProc != &idleProc && readyQueue.len >0){
-                                struct process *currentQueue = &readyQueue;
-                                struct process *prevQueue = &readyQueue;
-                                while(currentQueue != NULL){
-                                        prevQueue = currentQueue;
-                                        currentQueue = currentQueue->next;
-                                }
-                                // printf("time : %d\n", time);
-                                prevQueue->next = runningProc; // 현재 돌고있는 process 를 readyqueue에
-                                runningProc->state = S_READY;
-                                readyQueue.len++;
-                                runningProc = scheduler(); // 현 process 넣었으니 readyQueue에서 끄집어냄
-                                runningProc->state = S_RUNNING;
-                        }
-                        printf("퀀텀 runningProc id : %d 타겟서비스: %d 서비스: %d  req len: %d\n", runningProc->id, runningProc->targetServiceTime, runningProc->serviceTime, readyQueue.len);
+                        printf("퀀텀\n");
+                        nextState = S_READY;
                         qTime = 0;
                 }
+
                 struct ioDoneEvent *prevIoDoneQ = &ioDoneEventQueue;
                 struct ioDoneEvent *currentQ = &ioDoneEventQueue;
                 while (ioDoneEventQueue.len >0 && currentQ->next != NULL) { // CASE 3 : IO Done Event
                         // io끝나는 시간이 현재 시간일 때 blockqueue에서 ready로 후 스케쥴
                         prevIoDoneQ = currentQ;
                         currentQ = currentQ -> next;
-                        if(currentQ->doneTime == time){
+                        if(currentQ->doneTime == currentTime){
                                 pid = currentQ->procid; // 완료한 프로세스의 id
                                 prevIoDoneQ -> next = currentQ->next;
                                 ioDoneEventQueue.len--;
@@ -173,9 +156,7 @@ void procExecSim(struct process *(*scheduler)()) {
                                 while(blockedQueue.len > 0 && currentBlock->id != pid){
                                         prevBlock = currentBlock;
                                         currentBlock = currentBlock->next;
-                                        printf("currentBlock id : %d 현 proc id = %d ts: %d s: %d \n", currentBlock->id, runningProc->id, runningProc->targetServiceTime, runningProc->serviceTime);
                                 }
-
                                 prevBlock->next = currentBlock->next;
                                 currentBlock->next = NULL;
                                 blockedQueue.len--;
@@ -186,46 +167,26 @@ void procExecSim(struct process *(*scheduler)()) {
                                         currentReadyQueue = currentReadyQueue->next;
                                 }
                                 // currentBlock의상태가 terminate라면 그대로 두고 실행 프로세스 ready에 넣음
-                                if(currentBlock->state == S_TERMINATE || runningProc->targetServiceTime == runningProc->serviceTime){
-                                        // 종료 블럭 레디
-                                        if(runningProc->targetServiceTime == runningProc->serviceTime){
-                                                runningProc->state = S_TERMINATE;
-                                                runningProc->endTime = time;
-                                                runningProc = scheduler();
-                                        } else if(runningProc != &idleProc){
-                                                currentReadyQueue->next = runningProc;
-                                                runningProc->state = S_READY;
-                                        }
+                                if(currentBlock->state == S_TERMINATE){
+                                        // 종료상태면  레디에 넣지 않음.
                                 }else{
-                                // blockqueue에서 뽑아낸 것을 ready에 넣음.
+                                        // blockqueue에서 뽑아낸 것을 ready에 넣음.
+                                        if(pid==72)
+                                                printf("72 block state : %d \n", currentBlock->state);
                                         currentReadyQueue->next = currentBlock;
                                         currentBlock->state = S_READY;
                                         readyQueue.len++;
-                                        if(runningProc != &idleProc){
-                                                currentBlock->next = runningProc;
-                                                runningProc->state = S_READY;
-                                                readyQueue.len++;
-                                        }
                                 }
-                                runningProc = scheduler();
+                                nextState = S_READY;
                                 qTime=0;
-                                printf("io끝 현재 proc : %d ready q len : %d block id = %d 현재 proc타겟, 서비스 : %d %d\n", runningProc->id, readyQueue.len, currentBlock->id, currentBlock->targetServiceTime, currentBlock->serviceTime);
                         }
                 }
 
-                if (cpuUseTime == nextIOReqTime) { /* CASE 5: request IO operations (only when the process does not terminate) */
-                        // io가 일어날 때 : 현 process block, iodoneQueue에넣고 스케쥴러 호출
-                        if(runningProc->serviceTime==runningProc->targetServiceTime){
-                                runningProc->state = S_TERMINATE;
-                                runningProc->endTime = time;
-                                runningProc = scheduler();
-                                qTime=0;
-                        }
-                        runningProc->state = S_BLOCKED;
-                        ioDoneEvent[nioreq].procid = runningProc->id;
-                        ioDoneEvent[nioreq].doneTime = time+ioServTime[nioreq]; // 현재시간 + io가 동작하는 시간
+                if (cpuUseTime == nextIOReqTime) { // CASE 5: request IO operations (only when the process does not terminate)
+                        // io가 일어날 때(IO일 때 runP = idle아님) : 현 process block, iodoneQueue에넣고 스케쥴러 호출
 
-                        // blockedQueue에 실행중인 프로세스 넣고 실행 프로세스 업데이트
+                        printf("ioreq  currentTime : %d state : %d\n", currentTime, runningProc->state);
+                        // blockedQueue에 실행중인 프로세스 넣는다.
                         struct process *currentBlock = &blockedQueue;
                         while(blockedQueue.len > 0 && currentBlock->next != NULL){
                                 currentBlock = currentBlock->next;
@@ -233,12 +194,12 @@ void procExecSim(struct process *(*scheduler)()) {
                         currentBlock-> next = runningProc;
                         blockedQueue.len++;
 
-                        runningProc = scheduler(); // 실행 프로세스 업데이트
-                        qTime = 0;
-
                         // ioDoneEventQueue에 io시작한 것을 넣음
+                        ioDoneEvent[nioreq].procid = runningProc->id;
+                        ioDoneEvent[nioreq].doneTime = currentTime+ioServTime[nioreq]; // 현재시간 + io가 동작하는 시간
+
                         struct ioDoneEvent *currentIo = &ioDoneEventQueue;
-                        while(currentIo->next != NULL && ioDoneEventQueue.len >0){
+                        while(ioDoneEventQueue.len > 0 && currentIo->next != NULL){
                                 currentIo = currentIo->next;
                         }
                         currentIo->next = &ioDoneEvent[nioreq];
@@ -246,25 +207,60 @@ void procExecSim(struct process *(*scheduler)()) {
                         ioDoneEventQueue.len++;
                         nextIOReqTime = ioReqIntArrTime[++nioreq];
 
-                        printf("io req blockq : %d \n", blockedQueue.len);
+                        nextState = S_BLOCKED;
+                        qTime = 0;
                         cpuUseTime=0;
                 }
 
-                if (runningProc->serviceTime == runningProc->targetServiceTime && runningProc != &idleProc) { /* CASE 4 : the process job done and terminates */
-                        printf("현 프로세스 종료 id : %d, targetST : %d  ST: %d time : %d ready next id: %d\n", runningProc->id, runningProc->targetServiceTime,runningProc->serviceTime, time, readyQueue.next->id);
-                        runningProc->state = S_TERMINATE;
-                        runningProc->endTime = time;
-                        runningProc = scheduler();
+                if (runningProc->serviceTime == runningProc->targetServiceTime) { // CASE 4 : the process job done and terminates
+                        printf("현 프로세스 종료 id : %d, targetST : %d  ST: %d time : %d ready next id: %d termProc: %d\n", runningProc->id, runningProc->targetServiceTime,runningProc->serviceTime, currentTime, readyQueue.next->id, termProc);
+                        runningProc->endTime = currentTime;
+                        nextState = S_TERMINATE;
+                        printf("runningproc start : %d end : %d state: %d\n", runningProc->startTime, runningProc->endTime, runningProc->state);
                         qTime=0;
                 }
 
-                if(runningProc->startTime != 0)
-                        runningProc->startTime = time;
+                runningProc->state = nextState;
 
-                if(nproc == NPROC && runningProc == &idleProc && readyQueue.len == 0 && blockedQueue.len == 0){
+                if(nextState == S_TERMINATE){
+                        termProc++;
+                        runningProc = scheduler();
+                }
+                if(nextState == S_BLOCKED){
+                        runningProc = scheduler();
+                }
+                if(nextState == S_READY){
+                        struct process *lastReadyQueue = lastReadyQ();
+                        lastReadyQueue->next = runningProc;
+                        readyQueue.len++;
+                        runningProc = scheduler();
+                }
+                if(runningProc == &idleProc && readyQueue.len>0){
+                        runningProc = scheduler();
+                }
+                if(currentTime == 476){
+                        printf("runningProc = %d \n", runningProc->id);
+                }
+                nextState = S_RUNNING;
+                runningProc-> state = nextState;
+                if(runningProc->startTime ==0){
+                        runningProc->startTime = currentTime;
+                }
+                if(termProc == NPROC && blockedQueue.len == 0){
+                        printf("%d %d \n", readyQueue.next->next->id, ioDoneEventQueue.len);
                         return ;
                 }
-                // printf("%d\n", time);
+
+                if(currentTime == 476){
+                        struct process *block = &blockedQueue;
+                        printf("%d\n", blockedQueue.len);
+                        while(block->next != NULL){
+                                block = block->next;
+                                printf("#####block id : %d  state : %d \n", block->id, block->state);
+                        }
+
+                }
+                printf("%d \n", currentTime);
                 // call scheduler() if needed
 
         } // while loop
