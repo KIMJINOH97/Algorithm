@@ -1,4 +1,4 @@
-//
+// 2020 운영체제
 // CPU Schedule Simulator Homework
 // Student Number : B611050
 // Name : 김진오
@@ -108,7 +108,7 @@ void printState(int nproc, int cpu, int qtime) {
         }
         idq = idq->next;
     }
-    printf("%d processing Proc %d servT %d targetServT %d nproc %d cpuUseTime %d qTime %d proc %d ioDoneTime %d ioDoneEvent Length %d \n", currentTime, rp->id, rp->serviceTime, rp->targetServiceTime, nproc, cpu, qtime, proc, ioDoneTime, ioDoneEventQueue.len);
+    printf("%d processing Proc %d priority: %d servT %d targetServT %d nproc %d cpuUseTime %d qTime %d proc %d ioDoneTime %d ioDoneEvent Length %d \n", currentTime, rp->id, rp->priority, rp->serviceTime, rp->targetServiceTime, nproc, cpu, qtime, proc, ioDoneTime, ioDoneEventQueue.len);
 }
 
 void procExecSim(struct process *(*scheduler)()) {
@@ -120,19 +120,25 @@ void procExecSim(struct process *(*scheduler)()) {
     nextIOReqTime = ioReqIntArrTime[nioreq];
 
     idleProc.id = -1;
+    idleProc.targetServiceTime = INT_MAX;
+    readyQueue.id = -1;
     blockedQueue.id = -1;
     runningProc = &idleProc;  // 초기 돌아가는 프로세스는 idle
 
-    int sum = 0;
-    printf("initial nextForkTime : %d nextIOReqTime : %d \n", nextForkTime, nextIOReqTime);
+    int qFlag = 0;
     while (1) {
         currentTime++;  // 프로세스 생성 후 타이머
         qTime++;
         runningProc->serviceTime++;
         if (runningProc != &idleProc) cpuUseTime++;  //cpu 사용할 때 동작
+
+        cpuReg0 = runningProc->saveReg0;
+        cpuReg1 = runningProc->saveReg1;
         // MUST CALL compute() Inside While loop
         compute();
 
+        runningProc->saveReg0 = cpuReg0;
+        runningProc->saveReg1 = cpuReg1;
         //printState(nproc, cpuUseTime, qTime);
 
         if (currentTime == nextForkTime) { /* CASE 2 : a new process created */
@@ -145,17 +151,17 @@ void procExecSim(struct process *(*scheduler)()) {
             readyQueue.len++;
             nextForkTime = currentTime + procIntArrTime[++nproc];
             nextState = S_READY;
-            qTime = 0;
-            printf("process %d targetST %d servTime %d added to Ready Queue Next Fork Time %d \n", procTable[nproc - 1].id, procTable[nproc - 1].targetServiceTime, procTable[nproc - 1].serviceTime, nextForkTime);
+
+            //printf("process %d targetST %d servTime %d added to Ready Queue Next Fork Time %d \n", procTable[nproc-1].id, procTable[nproc-1].targetServiceTime, procTable[nproc-1].serviceTime, nextForkTime);
         }
 
         if (qTime == QUANTUM) {  // CASE 1 : The quantum expires
             // 현재 돌고 있는 process를 readyqueue에 넣고 스케쥴링
-            // printf("퀀텀\n");
             if (runningProc != &idleProc) {
                 nextState = S_READY;
             }
-
+            qFlag = 1;
+            runningProc->priority--;
             qTime = 0;
         }
 
@@ -222,18 +228,22 @@ void procExecSim(struct process *(*scheduler)()) {
             nextIOReqTime = cpuUseTime + ioReqIntArrTime[++nioreq];
             nextState = S_BLOCKED;
             qTime = 0;
+            if (qFlag != 1) {
+                runningProc->priority++;
+            }
         }
 
         if (runningProc->serviceTime == runningProc->targetServiceTime) {  // CASE 4 : the process job done and terminates
             runningProc->endTime = currentTime;
             nextState = S_TERMINATE;
             int diff = runningProc->endTime - runningProc->startTime;
-            sum += diff;
-            //printf("runningproc start : %d end : %d  걸린 시간 : %d\n", runningProc->startTime, runningProc->endTime, diff);
+            // printf("runningproc start : %d end : %d  걸린 시간 : %d\n", runningProc->startTime, runningProc->endTime, diff);
             qTime = 0;
         }
 
         runningProc->state = nextState;  // 현 process state 업데이트
+
+        // 5번째 스케쥴러
 
         if (nextState == S_TERMINATE) {
             termProc++;
@@ -250,6 +260,7 @@ void procExecSim(struct process *(*scheduler)()) {
                 readyQueue.len++;
             }
             runningProc = scheduler();
+            qTime = 0;
         }
         if (runningProc == &idleProc && readyQueue.len > 0) {
             runningProc = scheduler();
@@ -257,9 +268,9 @@ void procExecSim(struct process *(*scheduler)()) {
 
         nextState = S_RUNNING;
         runningProc->state = nextState;
+        qFlag = 0;
 
         if (termProc == NPROC && blockedQueue.len == 0) {
-            printf("차이 총 합: %d \n", sum);
             // printf("readyQ len : %d doneQ len : %d blockQ len: %d \n", readyQueue.len, ioDoneEventQueue.len, blockedQueue.len);
             return;
         }
@@ -281,22 +292,158 @@ struct process *RRschedule() {
             firstQueue->next = NULL;                  // 떨어져 나가면서 링크 끊기
         }
         readyQueue.len--;
-        printf("스케쥴 호출 넘겨준 id : %d tS : %d\n", firstQueue->id, firstQueue->targetServiceTime);
         firstQueue->state = S_RUNNING;
         return firstQueue;
     } else {
-        // printf("idle반환 \n");
         idleProc.state = S_RUNNING;
         return &idleProc;
     }
 }
 struct process *SJFschedule() {
+    if (readyQueue.len == 0) {
+        idleProc.state = S_RUNNING;
+        return &idleProc;
+    }
+
+    struct process *prevQueue = readyQueue.next;
+    struct process *currentQueue = readyQueue.next;
+    int min_time = currentQueue->targetServiceTime;
+    int Q_ServiceTime;
+    int ppid = currentQueue->id;
+    // 최소 시간 프로세스 찾기
+
+    while (currentQueue->next != NULL) {
+        prevQueue = currentQueue;
+        currentQueue = currentQueue->next;
+        Q_ServiceTime = currentQueue->targetServiceTime;
+        if (Q_ServiceTime < min_time) {
+            min_time = Q_ServiceTime;
+            ppid = currentQueue->id;
+        }
+    }
+    prevQueue = &readyQueue;
+    currentQueue = &readyQueue;
+    while (currentQueue->id != ppid) {
+        prevQueue = currentQueue;
+        currentQueue = currentQueue->next;
+    }
+
+    prevQueue->next = currentQueue->next;
+    currentQueue->next = NULL;
+
+    readyQueue.len--;
+    currentQueue->state = S_RUNNING;
+    return currentQueue;
 }
 struct process *SRTNschedule() {
+    if (readyQueue.len == 0) {
+        idleProc.state = S_RUNNING;
+        return &idleProc;
+    }
+
+    struct process *prevQueue = readyQueue.next;
+    struct process *currentQueue = readyQueue.next;
+    int min_time = currentQueue->targetServiceTime - currentQueue->serviceTime;
+    int diffTime;
+    int ppid = currentQueue->id;
+    // 최소 시간 프로세스 찾기
+
+    while (currentQueue->next != NULL) {
+        prevQueue = currentQueue;
+        currentQueue = currentQueue->next;
+        diffTime = currentQueue->targetServiceTime - currentQueue->serviceTime;
+        if (diffTime < min_time) {
+            min_time = diffTime;
+            ppid = currentQueue->id;
+        }
+    }
+    prevQueue = &readyQueue;
+    currentQueue = &readyQueue;
+    while (currentQueue->id != ppid) {
+        prevQueue = currentQueue;
+        currentQueue = currentQueue->next;
+    }
+
+    prevQueue->next = currentQueue->next;
+    currentQueue->next = NULL;
+
+    readyQueue.len--;
+    currentQueue->state = S_RUNNING;
+    return currentQueue;
 }
 struct process *GSschedule() {
+    if (readyQueue.len == 0) {
+        idleProc.state = S_RUNNING;
+        return &idleProc;
+    }
+
+    struct process *prevQueue = readyQueue.next;
+    struct process *currentQueue = readyQueue.next;
+    double min_time = (double)(currentQueue->serviceTime) / (double)(currentQueue->targetServiceTime);
+    double ratioTime;
+    int ppid = currentQueue->id;
+    // 최소 시간 프로세스 찾기
+
+    while (currentQueue->next != NULL) {
+        prevQueue = currentQueue;
+        currentQueue = currentQueue->next;
+        ratioTime = (double)(currentQueue->serviceTime) / (double)(currentQueue->targetServiceTime);
+        if (ratioTime < min_time) {
+            min_time = ratioTime;
+            ppid = currentQueue->id;
+        }
+    }
+
+    prevQueue = &readyQueue;
+    currentQueue = &readyQueue;
+    while (currentQueue->id != ppid) {
+        prevQueue = currentQueue;
+        currentQueue = currentQueue->next;
+    }
+
+    prevQueue->next = currentQueue->next;
+    currentQueue->next = NULL;
+
+    readyQueue.len--;
+    currentQueue->state = S_RUNNING;
+    return currentQueue;
 }
 struct process *SFSschedule() {
+    if (readyQueue.len == 0) {
+        idleProc.state = S_RUNNING;
+        return &idleProc;
+    }
+
+    struct process *prevQueue = readyQueue.next;
+    struct process *currentQueue = readyQueue.next;
+    int max_priority = currentQueue->priority;
+    int currentPriority;
+    int ppid = currentQueue->id;
+    // 최대 우선순위 프로세스 찾기
+
+    while (currentQueue->next != NULL) {
+        prevQueue = currentQueue;
+        currentQueue = currentQueue->next;
+        currentPriority = currentQueue->priority;
+        //printf("current id : %d priority : %d \n", currentQueue->id, currentQueue->priority);
+        if (currentPriority > max_priority) {
+            max_priority = currentPriority;
+            ppid = currentQueue->id;
+        }
+    }
+    prevQueue = &readyQueue;
+    currentQueue = &readyQueue;
+    while (currentQueue->id != ppid) {
+        prevQueue = currentQueue;
+        currentQueue = currentQueue->next;
+    }
+
+    prevQueue->next = currentQueue->next;
+    currentQueue->next = NULL;
+
+    readyQueue.len--;
+    currentQueue->state = S_RUNNING;
+    return currentQueue;
 }
 
 void printResult() {
