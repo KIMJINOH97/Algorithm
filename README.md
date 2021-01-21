@@ -19,7 +19,7 @@
     </tr>
     <tr>
         <td><b>'string'.join()</b></td>
-        <td>문자열의 원하는 부분을 바꿔줌</td>
+        <td>string을 list파라미터의 중간에 넣어 합친 str로 반환</td>
         <td>
             li = ['I', 'am', 'jinoh']
             ' 'join(li) -> 'I am jinoh'<br>
@@ -27,7 +27,7 @@
     </tr>
     <tr>
         <td><b>str.replace()</b></td>
-        <td>문자열의 원하는 부분을 바꿔줌</td>
+        <td>문자열의 원하는 부분을 바꾸어 그 string을 반환</td>
         <td>
             str = 'I am jinoh' <br>
             str.replace('jinoh', 'python') -> 'I am python'<br>
