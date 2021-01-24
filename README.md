@@ -200,9 +200,27 @@
         <td>매개변수의 문자열이 몇개 있는지 반환(대 소문자 구분)</td>
         <td>
             str('문자열', 시작위치, 끝위치) 가능
-            str = 'I am jinoh' <br>
-            str.count('i') -> 1반환<br>
-            str.count('o', 7, len(str)) -> 1반환
+            li = ['I', 'am','jinoh'] <br>
+            li.count('i') -> 0반환<br>
+            li.count('am', 1, len(li)) -> 0반환
+    </td>
+    </tr>
+    <tr>
+        <td><b>filter(func, iterable)</b></td>
+        <td>iterable에서 func 조건을 만족한 객체 반환</td>
+        <td>
+            li = [1, 0 , 0, 1, 1] <br>
+            li = list(filter(lambda x: x != 0, li))-> [1, 1, 1] 반환<br>
+    </td>
+    </tr>
+    <tr>
+        <td><b>list.count()</b></td>
+        <td>매개변수의 문자열이 몇개 있는지 반환(대 소문자 구분)</td>
+        <td>
+            str('문자열', 시작위치, 끝위치) 가능
+            li = ['I', 'am','jinoh'] <br>
+            li.count('i') -> 0반환<br>
+            li.count('am', 1, len(li)) -> 0반환
     </td>
     </tr>
 </table>
