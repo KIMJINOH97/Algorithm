@@ -214,13 +214,26 @@
     </td>
     </tr>
     <tr>
-        <td><b>list.count()</b></td>
-        <td>매개변수의 문자열이 몇개 있는지 반환(대 소문자 구분)</td>
+        <td><b>sorted(iterable, key=lambda x: x)</b></td>
+        <td>조건에 맞는 것을 정렬하여 정렬된 list반환</td>
         <td>
-            str('문자열', 시작위치, 끝위치) 가능
-            li = ['I', 'am','jinoh'] <br>
-            li.count('i') -> 0반환<br>
-            li.count('am', 1, len(li)) -> 0반환
+            li = [[0,1], [1,0], [2,2], [-1,3]] <br>
+            sorted(li, key=lambda x: x[0]) <br>
+            -> [[-1,3], [0,1], [1,0], [2,2]] 반환 <br>
+            sorted(li, key=lambda x: x[1]) <br>
+            -> [[1,0], [0,1], [2,2], [-1,3]] 반환 <br>
+    </td>
+    </tr>
+    </tr>
+    <tr>
+        <td><b>list.sort(key)</b></td>
+        <td>조건에 맞는 것을 정렬한다 반환값은 None</td>
+        <td>
+            li = [[0,1], [1,0], [2,2], [-1,3]] <br>
+            li.sort(key=lambda x: x[0]) <br>
+            -> [[-1,3], [0,1], [1,0], [2,2]] 반환 <br>
+            li.sort(key=lambda x: x[1]) <br>
+            -> [[1,0], [0,1], [2,2], [-1,3]] 반환 <br>
     </td>
     </tr>
 </table>
