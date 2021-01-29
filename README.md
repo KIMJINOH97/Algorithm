@@ -231,9 +231,9 @@
         <td>
             li = [[0,1], [1,0], [2,2], [-1,3]] <br>
             li.sort(key=lambda x: x[0]) <br>
-            -> li = [[-1,3], [0,1], [1,0], [2,2]]로 바뀜 <br>
+            -> li = [[-1,3], [0,1], [1,0], [2,2]] 반환 <br>
             li.sort(key=lambda x: x[1]) <br>
-            -> li = [[1,0], [0,1], [2,2], [-1,3]]로 바뀜 <br>
+            -> li = [[1,0], [0,1], [2,2], [-1,3]] 반환 <br>
     </td>
     </tr>
     <tr>
@@ -242,17 +242,16 @@
         <td>
             li = ['1', '2', '3', '4'] <br>
             map(int, li) <br>
-            -> map object를 반환함 제대로된 출력을 위해서는 <br>
+            -> map object를 반환함 <br>
+            제대로된 출력을 위해서는 <br>
             li = list(map(int, li)) <br>
             -> li = [1,2,3,4]로 바뀜 <br>
             # 응용을 해보면<br>
             def func(n): return n-1 <br>
             li = map(func, li) <br>
             -> li = [0,1,2,3] 반환
-
     </td>
     </tr>
-
 </table>
 
 ## dictionary
