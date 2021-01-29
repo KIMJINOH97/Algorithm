@@ -5,6 +5,7 @@
 > 알고리즘 python method 요약
 
 ## Str 관련 Method
+
 <table>
     <th>Method</th>
     <th>Return</th>
@@ -137,7 +138,6 @@
     </tr>
 </table>
 
-
 ## list 관련 Method
 
 <table>
@@ -236,6 +236,23 @@
             -> li = [[1,0], [0,1], [2,2], [-1,3]]로 바뀜 <br>
     </td>
     </tr>
+    <tr>
+        <td><b>map(func, iterable)</b></td>
+        <td>각 요소들을 해당 조건에 맞게 바꿔 객체를 반환한다. (map object)</td>
+        <td>
+            li = ['1', '2', '3', '4'] <br>
+            map(int, li) <br>
+            -> map object를 반환함 제대로된 출력을 위해서는 <br>
+            li = list(map(int, li)) <br>
+            -> li = [1,2,3,4]로 바뀜 <br>
+            # 응용을 해보면<br>
+            def func(n): return n-1 <br>
+            li = map(func, li) <br>
+            -> li = [0,1,2,3] 반환
+
+    </td>
+    </tr>
+
 </table>
 
 ## dictionary
@@ -256,7 +273,6 @@ dic['jinoh'] = 25 // 키가 중복되면 마지막 값으로 덮여씌워짐
 
 ```
 
-
 ## 정규표현식
 
 <table>
@@ -276,12 +292,11 @@ dic['jinoh'] = 25 // 키가 중복되면 마지막 값으로 덮여씌워짐
     </tr>
 </table>
 
-
 ```
 import re
 
 str = '1a2b3c4d'
-p = re.compile('[a-zA-Z]') 
+p = re.compile('[a-zA-Z]')
 // 위 코드의 축약 result = re.match('[a-z]+', "1a2b3c4d")
 
 p.findall(str) // ['a', 'b', 'c', 'd']
@@ -291,10 +306,11 @@ all = re.compile('[a-zA-Z]+')
 result = all.match(str)
 
 print(result.group()) // '1a2b3c4d'
-    
+
 ```
+
 Give a ⭐️ if this project helped you!
 
-***
+---
 
 _This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
