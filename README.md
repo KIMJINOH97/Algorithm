@@ -269,6 +269,9 @@ dic['jinsuk'] = 32 // 새로운 키와 값을 추가
 dic['jinoh'] = 25 // 키가 중복되면 마지막 값으로 덮여씌워짐
 // dic = {'jinoh' : 25, 'jinwuk' : 27, 'jinsuk' : 32 }
 
+for key in dic:
+    print(dic[key]) // 키값으로 딕셔너리 순회가능
+
 
 ```
 
@@ -283,7 +286,7 @@ dic['jinoh'] = 25 // 키가 중복되면 마지막 값으로 덮여씌워짐
     </tr>
     <tr>
         <td><b>p.findall(str)</b></td>
-        <td>조건에 맞는 문자열만 반환</td>
+        <td>조건에 맞는 문자열을 추출해 리스트로 반환</td>
     </tr>
     <tr>
         <td><b>p.match(str)</b></td>
@@ -298,13 +301,15 @@ str = '1a2b3c4d'
 p = re.compile('[a-zA-Z]')
 // 위 코드의 축약 result = re.match('[a-z]+', "1a2b3c4d")
 
-p.findall(str) // ['a', 'b', 'c', 'd']
+p.findall(str) // ['a', 'b', 'c', 'd'] 일치된 문자 없으면 [] 반환
 p.match(str) // 'None'
 
 all = re.compile('[a-zA-Z]+')
 result = all.match(str)
 
-print(result.group()) // '1a2b3c4d'
+print(result.group()) // '1a2b3c4d' result가 None이 아니어야 함.
+
+
 
 ```
 
