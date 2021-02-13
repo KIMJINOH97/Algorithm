@@ -313,8 +313,39 @@ print(result.group()) // '1a2b3c4d' result가 None이 아니어야 함.
 
 ```
 
+## set (집합)
+
+<table>
+    <th>Method</th>
+    <th>Return</th>
+    <tr>
+        <td><b>a & b</b></td>
+        <td>두 집합의 교집합을 반환</td>
+    </tr>
+    <tr>
+        <td><b>a | b</b></td>
+        <td>두 집합의 합집합을 반환</td>
+    </tr>
+</table>
+
+```
+a = [1, 1, 2, 2, 3, 4]
+b = [3, 4, 5, 6]
+
+a = set(a) // a = {1, 2, 3, 4}
+b = set(b) // b = {3, 4, 5, 6}
+
+c = a & b // c = {3, 4}
+c = a | b // c = {1, 2, 3, 4, 5, 6}
+
+```
+
 Give a ⭐️ if this project helped you!
 
 ---
 
 _This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+
+```
+
+```
