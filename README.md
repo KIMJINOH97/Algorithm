@@ -136,6 +136,14 @@
             str1.upper() -> 'I AM JINOH' 반환
         </td>
     </tr>
+    <tr>
+        <td><b>str[::-1]</b></td>
+        <td>문자열을 뒤집는다</td>
+        <td>
+            str1 = 'hello'<br>
+            str1[::-1] -> 'olleh' 반환
+        </td>
+    </tr>
 </table>
 
 ## list 관련 Method
