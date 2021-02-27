@@ -348,6 +348,25 @@ c = a | b // c = {1, 2, 3, 4, 5, 6}
 
 ```
 
+## heapq 모듈
+
+#### heaq 자료구조를 활용하면 arr에 수를 넣거나 뺄 때 logn만큼 걸리면서 pop() 할 때 가장 최솟 값을 출력 할 수 있다. (어떻게 넣느냐에 따라 최대, 최소 힙을 구현 가능하다.)
+
+```
+from heapq import heappush, heappop
+
+arr = [3, 1, 2, 5, 4]
+h = []
+for a in arr:
+    heappush(h, a)
+
+while h:
+    print(heappop(h))
+
+// 결과 1 2 3 4 5 출력
+
+```
+
 Give a ⭐️ if this project helped you!
 
 ---
