@@ -13,30 +13,30 @@ while T > 0:
     degree = [0 for i in range(N)]
 
     for i in range(N):
-        for j in range(N):
-            if score[j] > score[i]:  # 등수가 낮은 팀이 높은 팀을 가리킴
-                edge[i][j] = 1
-                degree[j] += 1
+        for j in range(i+1, N):
+            # if score[j] > score[i]:  # 등수가 낮은 팀이 높은 팀을 가리킴
+            a, b = score[i], score[j]
+            edge[a][b] = 1
+            degree[b] += 1
 
     m = int(std())  # 팀 등수가 바뀐 것들 a<b -> a>b
     flag = True
     for i in range(m):
         v1, v2 = map(int, std().split())
-        v1, v2 = v1-1, v2-1
-        a = score.index(v1)
-        b = score.index(v2)
-        if score[v1] < score[v2]:  # 원래 a 등수가 더 높았음
-            edge[a][b] = 0
-            degree[b] -= 1
-            edge[b][a] = 1
-            degree[a] += 1
+        v1, v2 = v1-1, v2-1  # 팀들
+        a, b = score.index(v1), score.index(v2)  # 팀들의 등수
+        if a < b:  # 원래 a 등수가 더 높았음
+            edge[v1][v2] = 0
+            degree[v2] -= 1
+            edge[v2][v1] = 1
+            degree[v1] += 1
         else:
-            edge[b][a] = 0
-            degree[a] -= 1
-            edge[a][b] = 1
-            degree[b] += 1
+            edge[v2][v1] = 0
+            degree[v1] -= 1
+            edge[v1][v2] = 1
+            degree[v2] += 1
 
-    q, answer = [], [0 for i in range(N)]
+    q, answer = [], []
 
     for i in range(N):
         if degree[i] == 0:
@@ -52,7 +52,7 @@ while T > 0:
     else:
         while q:
             vertax, d = q.pop(0)
-            answer[vertax] = d
+            answer.append(vertax+1)
             cnt = 0
             for i in range(N):
                 if edge[vertax][i] == 1:
