@@ -14,7 +14,6 @@ while T > 0:
 
     for i in range(N):
         for j in range(i+1, N):
-            # if score[j] > score[i]:  # 등수가 낮은 팀이 높은 팀을 가리킴
             a, b = score[i], score[j]
             edge[a][b] = 1
             degree[b] += 1
