@@ -1,27 +1,24 @@
-N = 65536
-def delete(str1):
-    return str1.isalpha()
-
 def solution(str1, str2):
-    answer = 0
-    str1, str2 = str1.lower(), str2.lower()
-    A, B = [], []
-    two(str1, A)
-    two(str2, B)
-    A, B = list(filter(delete, A)), list(filter(delete, B))
-    if A == [] and B == []: return N
-    A_set, B_set = set(A), set(B)
-    inter, union = list(A_set & B_set), list(A_set | B_set)
-    inter_count, union_count = 0, 0
-    for a in inter:
-        inter_count += min(A.count(a), B.count(a))
-    for a in union:
-        union_count += max(A.count(a), B.count(a))
-    
-    return int(inter_count/union_count*N)
+    N = 65536
 
-def two(str1, A):
-    for i, s in enumerate(str1):
-        if i ==0: continue
-        st = str1[i-1]+s
-        A.append(st)
+    def two(arr):
+        J_arr = []
+        for i in range(len(arr)-1):
+            if (arr[i].isalpha()) and (arr[i+1].isalpha()):
+                J_arr.append(arr[i]+arr[i+1])
+        return J_arr
+
+    def J(arr1, arr2):
+        set_arr1, set_arr2 = set(arr1), set(arr2)
+        inter, union = set_arr1 & set_arr2, set_arr1 | set_arr2
+        J_inter, J_union = 0, 0
+        for s in inter:  # sum함수 안썼을 때
+            min_s = min(arr1.count(s), arr2.count(s))
+            J_inter += min_s
+        # sum함수 썼는데 가독성이 좋아보이진 않음 그래도 코드 줄여줄 수 있어 좋은것같음
+        J_union = sum([max(arr1.count(st), arr2.count(st)) for st in union])
+
+        return int((J_inter/J_union)*N) if J_union != 0 else N
+
+    arr1_J, arr2_J = list(str1.lower()), list(str2.lower())
+    return J(two(arr1_J), two(arr2_J))
