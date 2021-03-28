@@ -364,6 +364,26 @@ while h:
     print(heappop(h))
 
 // 결과 1 2 3 4 5 출력
+```
+
+## deque 모듈
+
+#### deque 자료구조는 양방향 연결리스트 이며, bfs를 탐색할 때 활용한다.
+
+```
+
+from collections import deque
+
+arr = deque()
+arr.append(1)
+arr.append(2)
+arr.append(3) // arr = [1, 2, 3]
+
+// 중요!!
+arr.popleft() // arr = [1, 2]
+// list와는 다르게 O(1)의 시간 복잡도로 0번째 인덱스를 뽑아 낼 수 있다.
+
+arr.pop() // arr = [1]
 
 ```
 
@@ -372,6 +392,10 @@ Give a ⭐️ if this project helped you!
 ---
 
 _This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+
+```
+
+```
 
 ```
 
