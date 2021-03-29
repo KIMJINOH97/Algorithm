@@ -28,10 +28,12 @@
     </tr>
     <tr>
         <td><b>str.replace()</b></td>
-        <td>문자열의 원하는 부분을 바꾸어 그 string을 반환</td>
+        <td>문자열의 원하는 부분을 바꾸어 그 string을 반환 원하는 부분이 없다면 그대로 반환</td>
         <td>
             str = 'I am jinoh' <br>
             str.replace('jinoh', 'python') -> 'I am python'<br>
+            str1 = 'ABC'
+            str.replace('KKK', 'ABC') -> 'ABC'<br>
         </td>
     </tr>
     <tr>
