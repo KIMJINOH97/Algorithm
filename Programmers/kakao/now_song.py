@@ -1,32 +1,31 @@
 def solution(m, musicinfos):
-    answer = ''
-    music_list = []
-    time = -1
-    dic = {"C#" : '1', "D#" : '2', "F#" : '3', "G#" : '4', "A#" : '5'}
+    answer = []
+
+    melody = {'C#': 'H', 'D#': 'I', 'E#': 'M', 'F#': 'J', 'G#': 'K', 'A#': 'L'}
+
+    def clock_to_num(str1):
+        hour, minute = str1.split(':')
+        return int(hour)*60 + int(minute)
+
+    def change_song(str1):
+        for key in melody:
+            str1 = str1.replace(key, melody[key])
+        return str1
+
+    m = change_song(m)
+
     for music in musicinfos:
-        music_list.append(list(music.split(',')))
-    
-    for key in dic:
-        m = m.replace(key, dic[key])
-    
-    for music in music_list:
-        start_time = int(music[0][:2])*60 + int(music[0][3:])
-        end_time = int(music[1][:2])*60 + int(music[1][3:])
-        total_time = end_time - start_time
-        cmp = ""
-        for key in dic:
-            music[3] = music[3].replace(key, dic[key])
-        if len(music[3]) > total_time:
-            cmp = music[3][:total_time]
-        else:
-            multi =  total_time // len(music[3])
-            remain = total_time % len(music[3])
-            cmp = music[3] * multi
-            cmp += music[3][:remain]
-        
-        if m in cmp:
-            if total_time > time:
-                time = total_time
-                answer = music[2]
-    if time == -1: return "(None)"
-    return answer
+        start, end, song, content = music.split(',')
+        start, end = clock_to_num(start), clock_to_num(end)
+        total_len = end-start  # 곡 길이
+        content = change_song(content)
+
+        l_song = len(content)
+        really_song = content * (total_len // l_song) + \
+            content[:total_len % l_song]
+        if really_song.find(m) >= 0:
+            answer.append((song, total_len))
+    if len(answer) > 0:
+        answer = sorted(answer, key=lambda x: -x[1])
+
+    return answer[0][0] if len(answer) > 0 else "(None)"
