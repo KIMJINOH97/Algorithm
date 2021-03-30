@@ -1,24 +1,19 @@
 def solution(record):
     answer = []
-    action = []
-    user = {}
+    dic = {}
     for r in record:
-        li = list(r.split())
-        action.append(li)
-    for a in action:
-        if a[0] == 'Enter':
-            user[a[1]] = a[2]
-            answer.append([a[1], 'Enter'])
-        elif a[0] == 'Leave':
-            answer.append([a[1], 'Leave'])
-        else:
-            user[a[1]] = a[2]
-    ans = []
-    
-    for a in answer:
-        if a[1] == 'Enter':
-            ans.append(user[a[0]] + '님이 들어왔습니다.')
-        elif a[1] == 'Leave':
-            ans.append(user[a[0]] + '님이 나갔습니다.')
+        content = r.split()
+        active, user, nick = content[0], content[1], ''
+        if len(content) == 3:
+            nick = content[2]
+        if active == 'Enter':
+            dic[user] = nick
+            answer.append((user, "님이 들어왔습니다."))
+        elif active == 'Leave':
+            answer.append((user, "님이 나갔습니다."))
+        else:  # 이름 변경
+            dic[user] = nick
 
-    return ans
+    answer = list(map(lambda x: dic[x[0]] + x[1], answer))
+
+    return answer
