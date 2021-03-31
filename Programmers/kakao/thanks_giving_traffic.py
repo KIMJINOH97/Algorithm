@@ -1,37 +1,37 @@
 def solution(lines):
     answer = 0
     traffic = []
-    m = []
-    for line in lines:
-        li = line.split()
-        li.pop(0)
-        time = list(map(float, li[0].split(':')))
-        total_time = int(1000*(3600*time[0] + 60*time[1] + time[2]))
-        ing = int(1000*float(li[1][:-1]))
-        if total_time < 3000:
-            traffic.append([total_time - ing, total_time])
-            continue
-        if ing >= 3000:
-            li[0] = total_time - 2999
-        else:
-            li[0] = total_time-ing+1
-        li[1] = total_time
-        traffic.append(li)
 
-    traffic = sorted(traffic, key=lambda x: x[0])
-    for tr in traffic:
-        if len(m) == 0:
-            m.append(tr[1])
-            if answer < len(m):
-                answer = len(m)
-            continue
-        m.append(tr[1])
-        new_m = []
-        for i in range(len(m)):
-            if m[i] >= tr[0]-999:
-                new_m.append(m[i])
-        m = new_m
-        if answer < len(m):
-            answer = len(m)
+    def change_clock(c):
+        hour, minute, second = map(float, c.split(':'))
+        total = 1000*(hour*3600 + minute*60 + second)
+        return int(total)
+
+    for line in lines:
+        li = line.split()[1:]
+        clock, t = li
+        time = int(float(t[:-1])*1000)-1
+        end = change_clock(clock)
+        if time < 3000:
+            start = end - time
+        else:
+            end = start - 2999
+        traffic.append((start, end, clock, t))
+
+    traffic = sorted(traffic)
+    t_len = len(traffic)
+
+    for i, tr in enumerate(traffic):
+        s, e, a, b = tr
+        limit = s - 999
+        cnt = 1
+
+        for j in range(i-1, -1, -1):
+            next_s, next_e, c, d = traffic[j]
+            if next_e >= limit:
+                cnt += 1
+
+        if cnt > answer:
+            answer = cnt
 
     return answer
