@@ -153,11 +153,10 @@
             str1 = ' hello '<br>
             str1.strip() -> 'hello' 반환<br>
             str1.rstrip() -> ' hello' 반환<br>
-            // rstrip() 은 오른쪽 끝을 탐색 (r: right 해석)<br>
-            <br>
+            // rstrip() 은 오른쪽 끝을 탐색 
+            <br>(r: right 해석)<br>
             str1.lstrip() -> 'hello ' 반환<br>
-            // lstrip() 은 왼쪽 끝을 탐색 (l: left 해석)<br>
-            <br>
+            // lstrip() 은 왼쪽 끝을 탐색 <br>(l: left 해석)<br>
             str1 = '..hello'<br>
             str1.lstrip('.') -> 'hello' 반환
         </td>
