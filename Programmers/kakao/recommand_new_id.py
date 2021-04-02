@@ -2,56 +2,26 @@ import re
 
 
 def solution(new_id):
-    p = re.compile('[0-9a-zA-Z\-\_\.]+')
-    check = p.match(new_id)
-    if new_id[-1] != '.' and new_id[0] != '.' and 3 <= len(new_id) <= 15:
-        if check and check == new_id:
-            return new_id
+    new_id = new_id.lower()
 
-    new_id = list(new_id)
-    for i, s in enumerate(new_id):
-        if s.isupper():
-            new_id[i] = s.lower()
+    p = re.compile('[a-zA-Z0-9]+|[.]+|_|-')
+    tmp_id = p.findall(new_id)
+    for i, tmp in enumerate(tmp_id):
+        if tmp_id[i][0] == '.':
+            tmp_id[i] = '.'
+    tmp_id = ''.join(tmp_id)
+    tmp_id = tmp_id.strip('.')
 
-    new_id = p.findall(str(new_id))
-    str1 = ''
-    same = False
-    for s in new_id:
-        if s == '.':
-            if same == False:
-                str1 += s
-                same = True
-                continue
-            else:
-                continue
-        else:
-            same = False
-            str1 += s
-    print(str1)
+    if len(tmp_id) == 0:
+        tmp_id += "a"
+    new_id = tmp_id
+    if len(new_id) >= 16:
+        new_id = new_id[:15]
+        if new_id[-1] == '.':
+            new_id = new_id[:-1]
 
-    while True:
-        if len(str1) == 0:
-            break
-        if str1[-1] != '.' and str1[0] != '.':
-            break
-        if str1[-1] == '.':
-            str1 = str1[:-1]
-        if len(str1) != 0 and str1[0] == '.':
-            str1 = str1[1:]
-    if len(str1) == 0:
-        str1 += 'a'
-    if len(str1) >= 16:
-        str1 = str1[:15]
+    if len(new_id) <= 2:
+        k = new_id[-1]
+        new_id += k*(3-len(new_id))
 
-    while True:
-        if len(str1) == 0:
-            break
-        if str1[-1] != '.':
-            break
-        str1 = str1[:-1]
-
-    if len(str1) <= 2:
-        while len(str1) != 3:
-            str1 += str1[-1]
-
-    return str1
+    return new_id
