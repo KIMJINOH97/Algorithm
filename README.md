@@ -146,6 +146,22 @@
             str1[::-1] -> 'olleh' 반환
         </td>
     </tr>
+    <tr>
+        <td><b>str.strip()</b></td>
+        <td>문자열의 양쪽 끝에 해당 문자가 있으면 지운다</td>
+        <td>
+            str1 = ' hello '<br>
+            str1.strip() -> 'hello' 반환<br>
+            str1.rstrip() -> ' hello' 반환<br>
+            // rstrip() 은 오른쪽 끝을 탐색 (r: right 해석)<br>
+            <br>
+            str1.lstrip() -> 'hello ' 반환<br>
+            // lstrip() 은 왼쪽 끝을 탐색 (l: left 해석)<br>
+            <br>
+            str1 = '..hello'<br>
+            str1.lstrip('.') -> 'hello' 반환
+        </td>
+    </tr>
 </table>
 
 ## list 관련 Method
