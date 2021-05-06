@@ -98,8 +98,10 @@
         <td>
             str1 = 'I am jin5' <br>
             str2 = '123124'<br>
+            str3 = '-1234' <br>
             str1.isdigit() -> False<br>
-            str2.isdigit() -> True
+            str2.isdigit() -> True<br>
+            str3.isdigit() -> False
         </td>
     </tr>
     <tr>
