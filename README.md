@@ -389,6 +389,8 @@ while h:
 
 #### deque 자료구조는 양방향 연결리스트 이며, bfs를 탐색할 때 활용한다.
 
+#### list.append(), deque.append() 차이: 둘 다 같은 O(1)이지만, 상수 배 만큼의 차이가 난다. list.append()가 4배정도 빠른듯 함.
+
 ```
 
 from collections import deque
