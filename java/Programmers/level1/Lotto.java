@@ -1,6 +1,8 @@
+package Programmers.level1;
+
 import java.util.*;
 
-class Lotto {
+public class Lotto {
     public int[] solution(int[] lottos, int[] win_nums) {
         int[] answer = {0, 0};
         int max_count = 0;
