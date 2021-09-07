@@ -1,69 +1,58 @@
 def solution(words, queries):
     answer = []
-
+    
     class Trie:
         def __init__(self):
-            self.pre_trie = {}
-            self.post_trie = {}
-            self.len_trie = {}
-
-        def addlen(self, l):
-            k = self.len_trie
-            if l not in k:
-                k[l] = 1
+            self.frontDic = {}
+            self.backDic = {}
+            
+        def add(self, word, isFront):
+            dic = self.frontDic
+            if not isFront:
+                dic = self.backDic
+                
+            N = len(word)
+            if N not in dic:
+                dic[N] = [word]
             else:
-                k[l] += 1
-
-        def add(self, word, pre):
-            l_word = len(word)
-            if pre:
-                tr = self.pre_trie
-            else:
-                tr = self.post_trie
+                dic[N].append(word)
+                
             for w in word:
-                if w not in tr:
-                    tr[w] = {}
-                tr = tr[w]
-
-                if not l_word in tr:
-                    tr[l_word] = [word]
+                if w not in dic:
+                    dic[w] = {}
+                dic = dic[w]
+                if N in dic:
+                    dic[N].append(word)
                 else:
-                    tr[l_word].append(word)
-
-        def findpre(self, word, pre):
-            if pre:
-                tr = self.pre_trie
-            else:
-                tr = self.post_trie
-            l_word = len(word)
+                    dic[N] = [word]
+        
+        
+        def find(self, word, isFront):
+            dic = self.frontDic
+            if not isFront:
+                dic = self.backDic
+                
+            N = len(word)
             for w in word:
-                if w != "?" and w not in tr:
+                if w == '?':
+                    break
+                
+                if w not in dic:
                     return 0
-
-                if w == "?":
-                    if l_word in tr:
-                        return len(tr[l_word])
-                    else:
-                        return 0
-                tr = tr[w]
-
-        def all_question(self, l):
-            tr = self.len_trie
-            if l in tr:
-                return tr[l]
-            return 0
-
+                
+                dic = dic[w]
+            
+            return len(dic[N]) if N in dic else 0
+            
     trie = Trie()
     for word in words:
-        trie.addlen(len(word))
         trie.add(word, True)
         trie.add(word[::-1], False)
-
-    for q in queries:
-        if q[0] == "?" and q[-1] == "?":
-            answer.append(trie.all_question(len(q)))
-        elif q[0] == "?":
-            answer.append(trie.findpre(q[::-1], False))
+    
+    for query in queries:
+        if query[0] == '?':
+            answer.append(trie.find(query[::-1], False))
         else:
-            answer.append(trie.findpre(q, True))
+            answer.append(trie.find(query, True))
+    
     return answer
