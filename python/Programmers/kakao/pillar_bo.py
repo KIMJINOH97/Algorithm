@@ -1,84 +1,81 @@
-def solution(n, build_frame):
+def solution(N, build_frame):
     answer = []
-    PILLAR, BO = 0, 1
-    board = [[[0, 0] for i in range(n+1)] for j in range(n+1)]
 
-    def upPillar(r, c):
-        if checkPillar(r, c):
-            board[r][c][PILLAR] = 1
-        return
+    GI, BO = 0, 1
+    RM, UP = 0, 1
+    N += 1
+
+    board = [[[0, 0] for i in range(N)] for j in range(N)]
+
+    def check():
+        for i in range(N):
+            for j in range(N):
+                if board[i][j][GI] == UP:
+                    result = checkPillar(i, j)
+                    if not result:
+                        return False
+
+                if board[i][j][BO] == UP:
+                    result = checkBo(i, j)
+                    if not result:
+                        return False
+
+        return True
 
     def checkPillar(r, c):
-        if r == n or board[r+1][c][PILLAR]:
+        # 맨 밑에 있을 때
+        if r == N-1:
             return True
 
-        if (c-1 >= 0 and board[r][c-1][BO]) or board[r][c][BO]:
+        # 다른 기둥이 밑에 있어 세워질 때
+        if r + 1 < N and board[r+1][c][GI] == UP:
+            return True
+
+        # 보 위에 기둥 세워 졌을 때
+        if c - 1 >= 0 and board[r][c-1][BO] == UP:
+            return True
+
+        # 보 위에 기둥 세워 졌을 때
+        if board[r][c][BO] == UP:
             return True
 
         return False
 
     def checkBo(r, c):
-        if c-1 >= 0 and c+1 <= n:
-            if board[r][c-1][BO] and board[r][c+1][BO]:
-                return True
-
-        if board[r+1][c][PILLAR] or board[r+1][c+1][PILLAR]:
+        # 보의 왼쪽에 기둥이 세워 졌을 때
+        if board[r+1][c][GI] == UP:
             return True
+
+        # 보의 오른쪽에 기둥이 세워졌을 때
+        if board[r+1][c+1][GI] == UP:
+            return True
+
+        # 왼쪽에 보가 있는지 판단
+        if c - 1 >= 0 and board[r][c-1][BO] == UP:
+            # 오른쪽에도 보가 있는지 판단
+            if c + 1 < N and board[r][c+1][BO] == UP:
+                return True
 
         return False
 
-    def removePillar(r, c):
-        board[r][c][PILLAR] = 0
+    for x, y, a, b in build_frame:
+        r, c = (N-1)-y, x
 
-        for i in range(n+1):
-            for j in range(n+1):
-                if board[i][j][BO] and not checkBo(i, j):
-                    board[r][c][PILLAR] = 1
-                    return
-                if board[i][j][PILLAR] and not checkPillar(i, j):
-                    board[r][c][PILLAR] = 1
-                    return
-        return
+        # a -> 기둥 or 보  b -> 제거 or 세우기
+        board[r][c][a] = b
 
-    def addBo(r, c):
-        if checkBo(r, c):
-            board[r][c][BO] = 1
-        return
+        result = check()
 
-    def removeBo(r, c):
+        if not result and b == UP:
+            board[r][c][a] = RM
+        elif not result and b == RM:
+            board[r][c][a] = UP
 
-        board[r][c][BO] = 0
-
-        for i in range(n+1):
-            for j in range(n+1):
-                if board[i][j][PILLAR]:
-                    if not checkPillar(i, j):
-                        board[r][c][BO] = 1
-                        return
-                if board[i][j][BO]:
-                    if not checkBo(i, j):
-                        board[r][c][BO] = 1
-                        return
-
-        return
-
-    for x, y, a, b in build_frame:  # a (0: 기둥, 1: 보) b (0: 삭제, 1: 설치)
-        c, r = x, n - y
-        if a == PILLAR:
-            if b == 1:
-                upPillar(r, c)
-            else:
-                removePillar(r, c)
-        else:
-            if b == 1:
-                addBo(r, c)
-            else:
-                removeBo(r, c)
-
-    for i in range(n+1):
-        for j in range(n+1):
-            for k in range(2):
-                if board[i][j][k] == 1:
-                    answer.append([j, n-i, k])
+    for i in range(N):
+        for j in range(N):
+            if board[i][j][GI] == 1:
+                answer.append([j, N-1-i, GI])
+            if board[i][j][BO] == 1:
+                answer.append([j, N-1-i, BO])
 
     return sorted(answer, key=lambda x: (x[0], x[1], x[2]))
